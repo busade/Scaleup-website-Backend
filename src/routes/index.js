@@ -1,5 +1,6 @@
 import express from 'express';
 import applicationRoutes from './applicationRoutes.js';
+import contactRoutes from './contactRoutes.js';
 
 const router = express.Router();
 
@@ -18,5 +19,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/api/applications', applicationRoutes);
+router.use('/api/contact', contactRoutes);
 
 export default router;
