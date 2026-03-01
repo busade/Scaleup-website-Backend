@@ -1,4 +1,6 @@
 import express from 'express';
+import applicationRoutes from './applicationRoutes.js';
+
 const router = express.Router();
 
 /**
@@ -6,20 +8,15 @@ const router = express.Router();
  * /:
  *   get:
  *     summary: Welcome message
+ *     tags: [General]
  *     responses:
  *       200:
  *         description: Returns a welcome message
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Welcome to ScaleUp API
  */
 router.get('/', (req, res) => {
   res.json({ message: 'Welcome to ScaleUp API' });
 });
+
+router.use('/api/applications', applicationRoutes);
 
 export default router;
