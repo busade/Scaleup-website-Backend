@@ -28,7 +28,7 @@ export const submitContact = async (req, res) => {
     // send notification email
     try {
       await sendMail({
-        to: email,
+        to: process.env.SMTP_USER,
         subject: `New contact message from ${name}`,
         text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\nMessage:\n${message}`
       });
