@@ -36,27 +36,37 @@ Swagger UI is available at [`/api-docs`](http://localhost:3000/api-docs) once th
 
 ### Email Notifications
 
-The contact form will now send a notification email to a configured address instead of syncing to Google Sheets.
+The contact form now sends confirmation emails to users and admin notifications using **SendGrid** (recommended) or **Nodemailer** as a fallback.
 
-Add the following to your `.env` file:
+#### SendGrid Setup (Recommended)
+
+1. **Get your SendGrid API Key**:
+   - Sign up for [SendGrid](https://sendgrid.com/)
+   - Go to Settings → API Keys
+   - Create a new API key with "Mail Send" permissions
+
+2. **Add to your `.env` file**:
+   ```env
+   SENDGRID_API_KEY=your_api_key_here
+   SENDGRID_FROM_EMAIL=noreply@yourdomain.com
+   ADMIN_EMAIL=admin@yourdomain.com
+   ```
+
+#### Alternative: SMTP Setup (Fallback)
+
+If you don't provide a SendGrid API key, the app will use SMTP (Nodemailer). Add to your `.env` file:
 
 ```env
-# SMTP server settings
-SMTP_HOST=smtp.example.com
+SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
-SMTP_USER=user@example.com
-SMTP_PASS=supersecret
-SMTP_SECURE=false       # true for 465/TLS, false for 587/STARTTLS
-EMAIL_FROM="no-reply@example.com"
-# where notifications should be sent
-CONTACT_NOTIFICATION_EMAIL=admin@example.com
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+SMTP_SECURE=false
+ADMIN_EMAIL=admin@yourdomain.com
 ```
 
-Install the mailer dependency:
+**Note**: The `@sendgrid/mail` package is already included in dependencies. If using SMTP only, `nodemailer` is also included.
 
-```
-npm install nodemailer
-```
 
 ## Google Sheets Integration Setup
 
