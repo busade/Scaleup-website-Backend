@@ -1,8 +1,8 @@
 import Contact from '../models/contact.js';
 import logger from '../utils/logger.js';
 import validator from 'validator';
-import { sendMail } from '../utils/email.js';
-
+import { appendRowToSheet } from '../utils/googleSheets.js';
+import Waitlist from '../models/user.js';
 /**
  * @desc    Submit a contact message
  * @route   POST /api/contact
@@ -25,52 +25,22 @@ export const submitContact = async (req, res) => {
 
     logger.info(`New contact message received from ${email}. ID: ${contact._id}`);
 
-    // Send confirmation email to user
+    // Write to Google Sheets (Contacts sheet)
     try {
-      await sendMail({
-        to: email,
-        subject: 'Thank you for contacting Scaleup',
-        html: `
-          <h2>Thank you, ${name}!</h2>
-          <p>We've received your message and will get back to you soon.</p>
-          <hr>
-          <p><strong>Your message:</strong></p>
-          <p><strong>Subject:</strong> ${subject}</p>
-          <p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>
-          <hr>
-          <p>Best regards,<br>Scaleup Team</p>
-        `
-      });
-      logger.info(`Confirmation email sent to ${email} for contact message ${contact._id}`);
-    } catch (mailErr) {
-      logger.error(`Failed to send confirmation email to ${email}:`, mailErr);
-      // Continue even if confirmation email fails
-    }
-
-    // Send notification email to admin
-    try {
-      const adminEmail = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL;
-      if (adminEmail) {
-        await sendMail({
-          to: adminEmail,
-          subject: `New Contact Message: ${subject}`,
-          html: `
-            <h2>New Contact Message</h2>
-            <p><strong>From:</strong> ${name} (${email})</p>
-            <p><strong>Subject:</strong> ${subject}</p>
-            <hr>
-            <p><strong>Message:</strong></p>
-            <p>${message.replace(/\n/g, '<br>')}</p>
-            <hr>
-            <p><strong>Message ID:</strong> ${contact._id}</p>
-            <p><strong>Received:</strong> ${new Date().toLocaleString()}</p>
-          `
-        });
-        logger.info(`Admin notification email sent for contact message ${contact._id}`);
-      }
-    } catch (mailErr) {
-      logger.error(`Failed to send admin notification email:`, mailErr);
-      // Continue even if admin email fails
+      await appendRowToSheet(
+        {
+          name,
+          email,
+          subject,
+          message,
+          submittedAt: new Date().toLocaleString(),
+        },
+        process.env.GOOGLE_CONTACTS_SHEET_NAME || 'Contacts'
+      );
+      logger.info(`Contact message synced to Google Sheets, ID: ${contact._id}`);
+    } catch (sheetErr) {
+      logger.error(`Failed to sync contact message to Google Sheets:`, sheetErr);
+      // Continue even if sheet sync fails
     }
 
     res.status(201).json({
@@ -90,3 +60,43 @@ export const submitContact = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const submitWailist = async(req, res) => {
+  try{
+    const { email } = req.body;
+    if (email) {
+      if (!validator.isEmail(email)) {
+        return res.status(400).json({ message: "Invalid email"})
+      }
+      const email_check = await Waitlist.findOne({ email })
+      if (email_check) {
+          return res.status(400).json({ message: "Email already in waitlist"})
+      }
+      const waitlist = await Waitlist.create({ email});
+      // Write to Google Sheets (Contacts sheet)
+    try {
+      await appendRowToSheet(
+        {
+          email,
+          submittedAt: new Date().toLocaleString(),
+        },
+        process.env.GOOGLE_WAITLIST_SHEET_NAME || 'Waitlist'
+      );
+      logger.info(`Waitlist entry synced to Google Sheets, ID: ${waitlist._id}`);
+    } catch (sheetErr) {
+      logger.error(`Failed to sync waitlist entry to Google Sheets:`, sheetErr);
+      // Continue even if sheet sync fails
+    }
+
+      return res.status(201).json ({ message: "Email added to waitlist successfully", id: waitlist._id})
+    } else {
+      return res.status(400).json({ message: "Email is required"})
+    }
+  }
+  catch (error) {
+    logger.error('Waitlist submission error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+
+}
+
