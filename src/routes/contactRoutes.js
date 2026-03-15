@@ -1,5 +1,5 @@
 import express from 'express';
-import { submitContact } from '../controllers/contactController.js';
+import { submitContact, submitWailist } from '../controllers/contactController.js';
 
 const router = express.Router();
 
@@ -27,6 +27,31 @@ const router = express.Router();
  *       400:
  *         description: Validation error
  */
-router.post('/', submitContact);
+router.post('/contact', submitContact);
+
+
+
+/**
+ * @swagger
+ * /api/waitlist:
+ *   post:
+ *     summary: Add email to waitlist
+ *     tags: [Waitlist]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email]
+ *             properties:
+ *               email: { type: string }
+ *     responses:
+ *       201:
+ *         description: Email added to waitlist successfully
+ *       400:
+ *         description: Validation error
+ */
+router.post('/waitlist', submitWailist);
 
 export default router;

@@ -19,6 +19,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/api/applications', applicationRoutes);
-router.use('/api/contact', contactRoutes);
+router.use('/api', contactRoutes);
 
 export default router;
