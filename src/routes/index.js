@@ -21,4 +21,20 @@ router.get('/', (req, res) => {
 router.use('/api/applications', applicationRoutes);
 router.use('/api', contactRoutes);
 
+// health check endpoint
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [General]
+ *     responses:
+ *       200:
+ *         description: Returns a health check message
+ */
+router.get('/health', (req, res) => {
+  res.json({ status: 'healthy' });
+});
+
 export default router;
