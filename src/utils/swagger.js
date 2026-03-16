@@ -10,8 +10,8 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: 'http://localhost:3000',
-      description: 'Local server'
+      url: ['http://localhost:3000',"https://api.scaleupbuild.org"],
+      description: 'API server'
     }
   ]
 };
