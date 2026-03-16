@@ -50,7 +50,7 @@ export const submitApplication = async (req, res) => {
     logger.info(`New application received from ${email}. ID: ${application._id}`);
 
     // Sync to Google Sheets (Non-blocking)
-    appendRowToSheet(req.body);
+    appendRowToSheet(req.body, process.env.GOOGLE_APPLICATIONS_SHEET_NAME || 'Applications');
 
     res.status(201).json({
       message: 'Application submitted successfully',

@@ -32,33 +32,33 @@ Swagger UI is available at [`/api-docs`](http://localhost:3000/api-docs) once th
 
 ## New Endpoint
 
-- `POST /api/contact` – send a message through the contact form. Requires `name`, `email`, `subject`, and `message` in the JSON body.
+- `POST /api/contact` – submit a contact message. Requires `name`, `email`, `subject`, and `message` in the JSON body.
+- `POST /api/applications` – submit a volunteer application (existing endpoint).
 
-### Email Notifications
+### Contact route behavior
 
-The contact form will now send a notification email to a configured address instead of syncing to Google Sheets.
+- Contact messages are saved to the database and written to Google Sheets (sheet name `Contacts` by default).
+- Email notifications are no longer sent for contact submissions.
 
-Add the following to your `.env` file:
+### Application route behavior
 
-```env
-# SMTP server settings
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=user@example.com
-SMTP_PASS=supersecret
-SMTP_SECURE=false       # true for 465/TLS, false for 587/STARTTLS
-EMAIL_FROM="no-reply@example.com"
-# where notifications should be sent
-CONTACT_NOTIFICATION_EMAIL=admin@example.com
-```
-
-Install the mailer dependency:
-
-```
-npm install nodemailer
-```
+- Volunteer applications are saved to the database and written to Google Sheets (sheet name `Applications` by default).
 
 ## Google Sheets Integration Setup
+
+To sync volunteer applications and contact submissions with a Google Sheet, follow these steps:
+
+1.  **Create a Google Sheet**: Create a new spreadsheet and copy its **Sheet ID** from the URL (the string between `/d/` and `/edit`).
+2.  **Google Cloud Console**:
+    *   Enable the **Google Sheets API**.
+    *   Create a **Service Account** and download its **JSON Key**.
+3.  **Share the Sheet**: Open your spreadsheet, click "Share", and add the `client_email` from your JSON key as an **Editor**.
+4.  **Environment Variables**: Add the following to your `.env` file:
+    *   `GOOGLE_SERVICE_ACCOUNT_EMAIL`: The `client_email` from your JSON key.
+    *   `GOOGLE_PRIVATE_KEY`: The `private_key` from your JSON key (ensure it's in a single line with `\n` characters).
+    *   `GOOGLE_SHEET_ID`: The ID from your spreadsheet URL.
+    *   `GOOGLE_CONTACTS_SHEET_NAME` (optional, default: `Contacts`).
+    *   `GOOGLE_APPLICATIONS_SHEET_NAME` (optional, default: `Applications`).
 
 To sync volunteer applications with a Google Sheet, follow these steps:
 
