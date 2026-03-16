@@ -17,7 +17,8 @@ connectDB();
 // enable CORS
 app.use(cors({
   origin: function(origin, callback){
-  callback(null, true)}
+  callback(null, true)},
+  credentials: true
 }));
 
 // HTTP request logging using morgan and winston
