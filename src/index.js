@@ -15,7 +15,10 @@ const app = express();
 connectDB();
 
 // enable CORS
-app.use(cors());
+app.use(cors({
+  origin: function(origin, callback){
+  callback(null, true)}
+}));
 
 // HTTP request logging using morgan and winston
 app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
