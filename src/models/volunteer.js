@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const volunteerSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   phoneNumber: { type: String, required: true },
   location: { type: String, required: true },
   linkedIn: { type: String, required: true },
