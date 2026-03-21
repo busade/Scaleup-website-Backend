@@ -33,6 +33,11 @@ export const submitApplication = async (req, res) => {
       return res.status(400).json({ message: 'Invalid email' });
     }
 
+    const existingVolunteer = await Volunteer.findOne({ email });
+    if (existingVolunteer) {
+      return res.status(400).json({ message: 'Volunteer with this email already exists' });
+    }
+
     const application = await Volunteer.create({
       firstName,
       lastName,
