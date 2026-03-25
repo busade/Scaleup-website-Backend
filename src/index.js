@@ -27,6 +27,9 @@ app.use(morgan('combined', { stream: { write: message => logger.info(message.tri
 // JSON body parsing
 app.use(express.json());
 
+// URL-encoded body parsing
+app.use(express.urlencoded({ extended: true }));
+
 // mount routes
 app.use('/', routes);
 

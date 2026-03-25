@@ -1,34 +1,33 @@
 import nodemailer from 'nodemailer';
 import logger from './logger.js';
-import { MailService } from '@sendgrid/mail';
+import { Resend } from 'resend';
 
 let transporter;
 
-const sendGridKey = process.env.SENDGRID_API_KEY;
-if (sendGridKey) {
-  const mailService = new MailService();
-  mailService.setApiKey(sendGridKey);
+const resendKey = process.env.RESEND_API_KEY;
+if (resendKey) {
+  const resend = new Resend(resendKey);
   transporter = {
     sendMail: async (options) => {
       const msg = {
         to: options.to,
-        from: options.from || process.env.SENDGRID_FROM_EMAIL || 'noreply@scaleup.com',
+        from: options.from || process.env.RESEND_FROM_EMAIL || 'noreply@mail.scaleupbuild.org',
         subject: options.subject,
         text: options.text,
         html: options.html
       };
 
       try {
-        await mailService.send(msg);
+        await resend.emails.send(msg);
         logger.info(`Email sent successfully to ${options.to}`);
         return { success: true };
       } catch (error) {
-        logger.error(`SendGrid error sending email to ${options.to}:`, error);
+        logger.error(`Resend error sending email to ${options.to}:`, error);
         throw error;
       }
     }
   };
-  logger.info('Email service initialized with SendGrid');
+  logger.info('Email service initialized with Resend');
 } else {
   transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -43,7 +42,7 @@ if (sendGridKey) {
 }
 
 /**
- * Send email using configured service (SendGrid or Nodemailer)
+ * Send email using configured service (Resend or Nodemailer)
  * @param {Object} options - Email options
  * @param {string} options.to - Recipient email address
  * @param {string} options.subject - Email subject
