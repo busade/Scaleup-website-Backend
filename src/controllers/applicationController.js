@@ -53,7 +53,19 @@ export const submitApplication = async (req, res) => {
     });
 
     logger.info(`New application received from ${email}. ID: ${application._id}`);
-
+    // send email notification to scaleup team (non-blocking)
+     try {
+       await sendMail({
+         to: process.env.SCALEUP_NOTIFICATION_EMAIL || "scaleupbuild@gmail.com",
+         subject: 'New Volunteer Application Received',
+         text: `A new volunteer application has been received:\n\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phoneNumber}\n\nSubmitted at: ${new Date().toLocaleString()}`,
+          html: `<h2>New Volunteer Application</h2><p><strong>Name:</strong> ${firstName} ${lastName}</p><p><strong>Email:</strong> ${email}</p><p><strong>Phone:</strong> ${phoneNumber}</p><p><strong>Submitted at:</strong> ${new Date().toLocaleString()}</p>`
+        });
+        logger.info(`Notification email sent to ScaleUp for application ID: ${application._id}`);
+      } catch (emailErr) {
+        logger.error(`Failed to send notification email for application ID: ${application._id}:`, emailErr);
+        // Continue even if email fails
+      }
     // Sync to Google Sheets (Non-blocking)
     appendRowToSheet(req.body, process.env.GOOGLE_APPLICATIONS_SHEET_NAME || 'Applications');
 
@@ -72,5 +84,6 @@ export const submitApplication = async (req, res) => {
     }
     
     res.status(500).json({ message: 'Server error' });
-  }
+  };
 };
+

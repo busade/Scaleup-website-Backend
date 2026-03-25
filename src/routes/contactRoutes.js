@@ -1,5 +1,5 @@
 import express from 'express';
-import { submitContact, submitWailist } from '../controllers/contactController.js';
+import { submitContact, submitWaitlist } from '../controllers/contactController.js';
 
 const router = express.Router();
 
@@ -52,6 +52,6 @@ router.post('/contact', submitContact);
  *       400:
  *         description: Validation error
  */
-router.post('/waitlist', submitWailist);
+router.post('/waitlist', submitWaitlist);
 
 export default router;
