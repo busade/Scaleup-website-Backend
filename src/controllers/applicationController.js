@@ -2,6 +2,7 @@ import Volunteer from '../models/volunteer.js';
 import logger from '../utils/logger.js';
 import validator from 'validator';
 import { appendRowToSheet } from '../utils/googleSheets.js';
+import { sendMail } from '../utils/email.js';
 
 /**
  * @desc    Submit a new volunteer application
@@ -54,6 +55,7 @@ export const submitApplication = async (req, res) => {
 
     logger.info(`New application received from ${email}. ID: ${application._id}`);
     // send email notification to scaleup team (non-blocking)
+    console.log(process.env.SCALEUP_NOTIFICATION_EMAIL)
      try {
        await sendMail({
          to: process.env.SCALEUP_NOTIFICATION_EMAIL || "scaleupbuild@gmail.com",
