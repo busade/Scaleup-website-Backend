@@ -55,7 +55,6 @@ export const submitApplication = async (req, res) => {
 
     logger.info(`New application received from ${email}. ID: ${application._id}`);
     // send email notification to scaleup team (non-blocking)
-    console.log(process.env.SCALEUP_NOTIFICATION_EMAIL)
      try {
        await sendMail({
          to: process.env.SCALEUP_NOTIFICATION_EMAIL || "scaleupbuild@gmail.com",
